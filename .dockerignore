@@ -1,0 +1,16 @@
+node_modules/
+.env
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+.git/
+main.py
+requirements.txt
+README.md
+DEMARRAGE.md
+CLAUDE.md
+start.sh
+nixpacks.toml
+railway.toml
