@@ -4,6 +4,9 @@
 
 let historique = [];
 let personaliteActive = 'tech';
+let tonActif = 'amical';
+let modeLong = false;
+let dernierMessageUtilisateur = '';
 let preferences = {
   historique: true,
   volume: 75,
@@ -45,6 +48,80 @@ const PERSONNALITES_DEF = {
     nom: 'Conteur',
     emoji: '📖',
     description: 'Maître de la narration et des métaphores'
+  },
+  historien: {
+    nom: 'Historien',
+    emoji: '🏛️',
+    description: 'Expert en histoire mondiale, civilisations et archéologie'
+  },
+  philosophe: {
+    nom: 'Philosophe',
+    emoji: '🧠',
+    description: 'Pensée critique, éthique et grands courants philosophiques'
+  },
+  chef: {
+    nom: 'Chef Cuisinier',
+    emoji: '👨‍🍳',
+    description: 'Cuisine du monde, recettes et techniques culinaires'
+  },
+  juriste: {
+    nom: 'Juriste',
+    emoji: '⚖️',
+    description: 'Droit, lois et conseils juridiques généraux'
+  },
+  psy: {
+    nom: 'Psychologue',
+    emoji: '💙',
+    description: 'Santé mentale, émotions et comportement humain'
+  },
+  coach: {
+    nom: 'Coach de Vie',
+    emoji: '🎯',
+    description: 'Développement personnel, objectifs et épanouissement'
+  },
+  prof: {
+    nom: 'Prof Strict',
+    emoji: '📐',
+    description: 'Professeur de lycée exigeant — maths, physique, français, histoire'
+  }
+};
+
+const TONS_DEF = {
+  amical: {
+    nom: 'Amical',
+    emoji: '😊',
+    desc: 'Chaleureux et décontracté',
+    prompt: 'Adopte un ton amical et chaleureux. Tutoie l\'utilisateur, sois décontracté et sympa, comme un ami qui aide.'
+  },
+  formel: {
+    nom: 'Formel',
+    emoji: '🎩',
+    desc: 'Professionnel et soutenu',
+    prompt: 'Adopte un ton formel et professionnel. Vouvoie l\'utilisateur, utilise un vocabulaire soutenu et précis.'
+  },
+  humoristique: {
+    nom: 'Humoristique',
+    emoji: '😄',
+    desc: 'Avec humour et légèreté',
+    prompt: 'Adopte un ton humoristique avec légèreté et un peu d\'humour. Fais sourire l\'utilisateur tout en restant utile.'
+  },
+  pedagogique: {
+    nom: 'Pédagogique',
+    emoji: '📝',
+    desc: 'Explications pas à pas',
+    prompt: 'Adopte un ton pédagogique. Explique chaque concept étape par étape, donne des exemples concrets, simplifie le complexe.'
+  },
+  direct: {
+    nom: 'Direct',
+    emoji: '⚡',
+    desc: 'Court et sans détours',
+    prompt: 'Adopte un ton direct et concis. Réponds brièvement, va droit au but, évite les répétitions et les formules superflues.'
+  },
+  poetique: {
+    nom: 'Poétique',
+    emoji: '✨',
+    desc: 'Lyrique et élaboré',
+    prompt: 'Adopte un ton poétique et littéraire. Utilise des métaphores, des images évocatrices et enrichis tes réponses d\'une touche artistique.'
   }
 };
 
@@ -732,6 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initialiserStickersChat();
   initialiserPersonnalites();
   initialiserRoles();
+  initialiserTons();
   initialiserMusique();
   initialiserStreaming();
   initialiserLivres();
@@ -802,6 +880,7 @@ async function envoyerMessage() {
   if (!message) return;
 
   ajouterMessageAuChat('user', message);
+  dernierMessageUtilisateur = message;
   champ.value = '';
   champ.focus();
 
@@ -836,28 +915,60 @@ function ajouterMessageAuChat(role, contenu, source) {
   const li = document.createElement('li');
   li.className = `message message-${role}`;
 
-  // Source label for assistant messages
+  // Groupe colonne : contient label + citation + bulle + lire-suite
+  const groupe = document.createElement('div');
+  groupe.className = 'msg-group';
+
+  // Label "Claude" / "App" au-dessus de la bulle (assistant seulement)
   if (role === 'assistant') {
     const label = document.createElement('span');
     label.className = 'label-app';
-    label.textContent = source === 'local' ? 'App' : 'Claude';
-    li.appendChild(label);
+    label.textContent = source === 'local' ? 'App' : 'של שירל IA';
+    groupe.appendChild(label);
   }
 
-  // Message bubble
+  // Citation de la question au-dessus de la réponse IA
+  if (role === 'assistant' && dernierMessageUtilisateur) {
+    const citation = document.createElement('div');
+    citation.className = 'message-citation';
+    const texte = dernierMessageUtilisateur.length > 60
+      ? dernierMessageUtilisateur.substring(0, 60) + '…'
+      : dernierMessageUtilisateur;
+    citation.textContent = '↩ ' + texte;
+    groupe.appendChild(citation);
+  }
+
+  // Bulle principale
   const div = document.createElement('div');
   div.className = 'message-content';
   div.textContent = contenu;
-  li.appendChild(div);
+  groupe.appendChild(div);
 
-  // Word count badge
+  // Bouton "Lire la suite" sous la bulle (assistant, messages longs)
+  if (role === 'assistant' && contenu.length > 300) {
+    div.classList.add('collapsed');
+    const btnLire = document.createElement('button');
+    btnLire.className = 'btn-lire-suite';
+    btnLire.textContent = '▼ Lire la suite';
+    let ouvert = false;
+    btnLire.addEventListener('click', () => {
+      ouvert = !ouvert;
+      div.classList.toggle('collapsed', !ouvert);
+      btnLire.textContent = ouvert ? '▲ Réduire' : '▼ Lire la suite';
+    });
+    groupe.appendChild(btnLire);
+  }
+
+  li.appendChild(groupe);
+
+  // Badge mots (à droite du groupe, aligné verticalement au centre)
   const nb = compterMots(contenu);
   const badge = document.createElement('span');
   badge.className = 'badge-mots';
   badge.textContent = nb + (nb > 1 ? ' mots' : ' mot');
   li.appendChild(badge);
 
-  // Per-message copy button
+  // Bouton copier
   const btnCopier = document.createElement('button');
   btnCopier.className = 'btn-copier-msg';
   btnCopier.title = 'Copier';
@@ -875,7 +986,7 @@ function ajouterMessageAuChat(role, contenu, source) {
   });
   li.appendChild(btnCopier);
 
-  // Hover actions: Supprimer + Laisser
+  // Actions hover : Supprimer + Laisser
   const actions = document.createElement('div');
   actions.className = 'actions';
   const btnSupp = document.createElement('button');
@@ -910,7 +1021,9 @@ async function appellerClaude(messageUtilisateur) {
     body: JSON.stringify({
       historique: historique,
       apiKey: cle,
-      personnalite: personaliteActive
+      personnalite: personaliteActive,
+      ton: tonActif,
+      modeLong: modeLong
     })
   });
 
@@ -934,6 +1047,7 @@ function copierDernierMessage() {
 
 function supprimerDernierMessage() {
   const liste = document.getElementById('liste-messages');
+  if (!liste) return;
   const dernier = liste.lastElementChild;
   if (dernier) {
     dernier.remove();
@@ -1019,6 +1133,7 @@ function initialiserPersonnalites() {
   Object.entries(PERSONNALITES_DEF).forEach(([key, perso]) => {
     const btn = document.createElement('button');
     btn.className = `personality-btn ${key === personaliteActive ? 'active' : ''}`;
+    btn.dataset.key = key;
     btn.innerHTML = `
       <div class="personality-emoji">${perso.emoji}</div>
       <div>${perso.nom}</div>
@@ -1034,19 +1149,11 @@ function initialiserPersonnalites() {
 
 function actualiserPersonnalites() {
   document.querySelectorAll('.personality-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  const bottons = document.querySelectorAll('.personality-btn');
-  const keys = Object.keys(PERSONNALITES_DEF);
-  keys.forEach((key, index) => {
-    if (key === personaliteActive) {
-      bottons[index].classList.add('active');
-    }
+    btn.classList.toggle('active', btn.dataset.key === personaliteActive);
   });
 
-  // Mettre à jour la ressource spécialité
-  document.getElementById('ressources-specialite').textContent =
-    PERSONNALITES_DEF[personaliteActive].nom;
+  const el = document.getElementById('ressources-specialite');
+  if (el) el.textContent = PERSONNALITES_DEF[personaliteActive].nom;
 }
 
 function initialiserRoles() {
@@ -1063,6 +1170,35 @@ function changerPersonnalite(key) {
   personaliteActive = key;
   actualiserPersonnalites();
   afficherNotification(`Rôle : ${PERSONNALITES_DEF[key].nom}`);
+}
+
+function initialiserTons() {
+  const liste = document.getElementById('liste-tons');
+  if (!liste) return;
+  liste.innerHTML = Object.entries(TONS_DEF).map(([key, ton]) => `
+    <button class="ton-btn${key === tonActif ? ' actif' : ''}" data-key="${key}" title="${ton.desc}" onclick="changerTon('${key}')">
+      <span class="ton-emoji">${ton.emoji}</span>
+      <span class="ton-nom">${ton.nom}</span>
+    </button>
+  `).join('');
+}
+
+function changerTon(key) {
+  tonActif = key;
+  document.querySelectorAll('.ton-btn').forEach(b => {
+    b.classList.toggle('actif', b.dataset.key === key);
+  });
+  afficherNotification(`Ton : ${TONS_DEF[key].emoji} ${TONS_DEF[key].nom}`);
+}
+
+function toggleModeLong() {
+  modeLong = !modeLong;
+  const btn = document.getElementById('btn-mode-long');
+  if (btn) {
+    btn.classList.toggle('actif', modeLong);
+    btn.textContent = modeLong ? '📝 Mode Long ✓' : '📝 Mode Long';
+  }
+  afficherNotification(modeLong ? '📝 Mode Long activé — réponses complètes et détaillées' : '📝 Mode Long désactivé — réponses courtes');
 }
 
 function toggleAjouterPersonnalite() {
@@ -1565,7 +1701,7 @@ function initialiserMusique() {
   if (!galerie) return;
 
   galerie.innerHTML = MUSIQUES.map(m => `
-    <div class="musique-card" onclick="ouvrirMusique('${m.nom}', '${m.url}')">
+    <div class="musique-card" data-nom="${m.nom}" data-url="${m.url}" onclick="ouvrirMusique(this.dataset.nom, this.dataset.url)">
       <div class="musique-emoji">${m.emoji}</div>
       <div class="musique-nom">${m.nom}</div>
       <div class="musique-desc">${m.desc}</div>
@@ -1877,7 +2013,7 @@ function afficherPlusDeFilms() {
   });
 
   galerie.innerHTML = filmsTries.map(f => `
-    <div class="musique-card ${f.badges.join(' ')}" onclick="afficherNotification('🎬 ${f.nom}')">
+    <div class="musique-card ${f.badges.join(' ')}" data-info="🎬 ${f.nom}" onclick="afficherNotification(this.dataset.info)">
       <div class="musique-emoji">${f.emoji}</div>
       <div class="musique-nom">${f.nom}</div>
       <div class="musique-desc">${f.desc} ⭐${f.rating}</div>
@@ -1906,7 +2042,7 @@ function afficherPlusDeLivres() {
   });
 
   galerie.innerHTML = livresTries.map(l => `
-    <div class="musique-card ${l.badges.join(' ')}" onclick="afficherNotification('📖 ${l.nom} par ${l.auteur}')">
+    <div class="musique-card ${l.badges.join(' ')}" data-info="📖 ${l.nom} par ${l.auteur}" onclick="afficherNotification(this.dataset.info)">
       <div class="musique-emoji">${l.emoji}</div>
       <div class="musique-nom">${l.nom}</div>
       <div class="musique-desc">${l.auteur} • ${l.desc} ⭐${l.rating}</div>
@@ -1947,7 +2083,7 @@ function filtrerLivresParGenre(genre) {
     return scoreB - scoreA;
   });
 
-  galerie.innerHTML = livresFiltres.map(l => `
+  galerie.innerHTML = livresFiltres.slice(0, 100).map(l => `
     <div class="musique-card ${l.badges.join(' ')} ${genreToClass(l.genre)}">
       <div class="musique-emoji">${l.emoji}</div>
       <div class="musique-nom">${l.nom}</div>
@@ -2111,10 +2247,6 @@ window.filtrerFilmsParGenreAvecBoutons = function(genre) {
       </div>
     `).join('');
 
-    // Marquer le bouton comme actif
-    document.querySelectorAll('#film-genre-filters .genre-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-
     afficherNotification(`🎬 ${filmsFiltres.length} films`);
   } catch (err) {
     console.error('Erreur filtrage films:', err);
@@ -2202,7 +2334,7 @@ window.filtrerLivresParGenreAvecBoutons = function(genre) {
       return scoreB - scoreA;
     });
 
-    galerie.innerHTML = livresFiltres.map(l => `
+    galerie.innerHTML = livresFiltres.slice(0, 100).map(l => `
       <div class="musique-card ${l.badges.join(' ')} ${genreToClass(l.genre)}">
         <div class="musique-emoji">${l.emoji}</div>
         <div class="musique-nom">${l.nom}</div>
@@ -2213,11 +2345,7 @@ window.filtrerLivresParGenreAvecBoutons = function(genre) {
       </div>
     `).join('');
 
-    // Marquer le bouton comme actif
-    document.querySelectorAll('#livre-genre-filters .genre-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-
-    afficherNotification(`📚 ${livresFiltres.length} livres`);
+    afficherNotification(`📚 ${livresFiltres.length} livres dans "${genre}"`);
   } catch (err) {
     console.error('Erreur filtrage livres:', err);
   }

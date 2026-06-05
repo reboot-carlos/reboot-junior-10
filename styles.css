@@ -386,12 +386,51 @@ a:hover {
   justify-content: flex-start;
 }
 
-.message-content {
+.msg-group {
+  display: flex;
+  flex-direction: column;
   max-width: 70%;
+  gap: 0.2rem;
+  align-items: flex-start;
+}
+
+.message-user .msg-group {
+  align-items: flex-end;
+}
+
+.message-content {
   padding: 0.75rem 1rem;
   border-radius: 12px;
   word-wrap: break-word;
-  line-height: 1.5;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-content.collapsed {
+  max-height: 120px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.btn-lire-suite {
+  display: block;
+  margin-top: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(107,147,240,0.15);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: 'Inter', Arial, sans-serif;
+}
+.btn-lire-suite:hover {
+  background: rgba(107,147,240,0.28);
 }
 
 .message-user .message-content {
@@ -403,6 +442,21 @@ a:hover {
   background: var(--carte);
   border: 1px solid var(--border);
   color: var(--texte);
+}
+
+.message-citation {
+  font-size: 0.72rem;
+  color: rgba(180,210,255,0.55);
+  background: rgba(107,147,240,0.08);
+  border-left: 2px solid rgba(107,147,240,0.4);
+  padding: 0.25rem 0.6rem;
+  border-radius: 0 6px 6px 0;
+  width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
 }
 
 .ressources-section {
@@ -1670,3 +1724,54 @@ video {
 }
 .menu-perso-item:hover { background: rgba(255,255,255,0.12); border-color: rgba(201,168,76,0.35); color: #fff; }
 .menu-perso-item.actif { background: rgba(201,168,76,0.20); border-color: rgba(201,168,76,0.45); color: var(--gold-light); }
+
+/* ── Sélecteur de ton ───────────────────────────────────── */
+.tons-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  padding: 0.25rem 0;
+}
+.ton-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: 'Inter', Arial, sans-serif;
+  transition: all 0.18s;
+  text-align: left;
+}
+.ton-emoji { font-size: 1rem; flex-shrink: 0; }
+.ton-nom   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ton-btn:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(201,168,76,0.35);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.ton-btn.actif {
+  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.12));
+  border-color: rgba(201,168,76,0.55);
+  color: var(--gold-light, #e0c068);
+  box-shadow: 0 0 8px rgba(201,168,76,0.15);
+}
+
+/* ── Bouton Mode Long ───────────────────────────────────── */
+.btn-mode-long {
+  font-weight: 600;
+  border-color: rgba(107,147,240,0.3);
+  color: rgba(255,255,255,0.6);
+}
+.btn-mode-long.actif {
+  background: rgba(107,147,240,0.2);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 8px rgba(107,147,240,0.2);
+}

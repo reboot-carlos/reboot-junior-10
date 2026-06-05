@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="he" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Claude IA - Chatbot</title>
+  <title>של שירל IA</title>
 
   <!-- Polices élégantes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
     <aside class="sidebar">
       <!-- Header sidebar -->
       <div class="sidebar-header">
-        <h2>Claude IA</h2>
+        <h2 dir="rtl">של שירל IA</h2>
         <button id="btn-new-chat" class="btn-new-chat" title="Nouvelle conversation">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -47,6 +47,13 @@
         </div>
       </div>
 
+      <div class="sidebar-section">
+        <h3 class="sidebar-section-title">🎨 Ton de la réponse</h3>
+        <div id="liste-tons" class="tons-list">
+          <!-- Les tons seront ajoutés par JavaScript -->
+        </div>
+      </div>
+
       <!-- Footer sidebar -->
       <div class="sidebar-footer">
         <a href="#" class="sidebar-link">📚 Aide</a>
@@ -61,7 +68,7 @@
       <!-- Header -->
       <header class="app-header">
         <div class="header-content">
-          <h1>Conversation avec Claude</h1>
+          <h1 dir="rtl">של שירל IA ✨</h1>
           <p>Discute avec une IA intelligente et personnalisable</p>
         </div>
         <div class="header-divider"></div>
@@ -125,7 +132,7 @@
             <ul id="liste-messages" class="messages-list">
               <li class="message message-assistant">
                 <div class="message-content">
-                  Bonjour ! 👋 Je suis Claude, ton assistant IA personnel. Comment puis-je t'aider aujourd'hui ?
+                  שלום ! 👋 אני IA של שירל. במה אוכל לעזור לך היום ?
                 </div>
               </li>
             </ul>
@@ -177,6 +184,9 @@
               </button>
             </div>
             <div class="chat-actions">
+              <button id="btn-mode-long" class="btn-action btn-mode-long" onclick="toggleModeLong()" title="Activer le mode réponse longue (dissertation, rédaction…)">
+                📝 Mode Long
+              </button>
               <button id="btn-copy-last" class="btn-action" title="Copier le dernier message">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
