@@ -1,0 +1,16 @@
+# Secrets — never commit
+.env
+
+# Node
+node_modules/
+
+# Python (kept in repo, excluded from Docker)
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db

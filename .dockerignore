@@ -7,7 +7,7 @@ venv/
 .venv/
 .git/
 main.py
-requirements.txt
+requirements.python.txt
 README.md
 DEMARRAGE.md
 CLAUDE.md
